@@ -1,0 +1,74 @@
+{
+    "title": "Abalone data",
+    "sources": {
+        "Original owners of database": [
+            "Marine Resources Division",
+            "Marine Research Laboratories - Taroona",
+            "Department of Primary Industry and Fisheries, Tasmania",
+            "GPO Box 619F, Hobart, Tasmania 7001, Australia (contact: Warwick Nash +61 02 277277, wnash@dpi.tas.gov.au)"
+        ],
+        "Donor of database": [
+            "Sam Waugh (Sam.Waugh@cs.utas.edu.au)",
+            "Department of Computer Science, University of Tasmania",
+            "GPO Box 252C, Hobart, Tasmania 7001, Australia"
+        ],
+        "Date received": "December 1995"
+    },
+    "numberOfInstances": 4177,
+    "numberOfAttributes": 8,
+    "attributes": [
+        {
+            "name": "length",
+            "type": "double",
+            "meas": "mm",
+            "description": "Longest shell measurement"
+        },
+        {
+            "name": "diameter",
+            "type": "double",
+            "meas": "mm",
+            "description": "perpendicular to length"
+        },
+        {
+            "name": "height",
+            "type": "double",
+            "meas": "mm",
+            "description": "with meat in shell"
+        },
+        {
+            "name": "wholeWeight",
+            "type": "double",
+            "meas": "mm",
+            "description": "whole abalone"
+        },
+        {
+            "name": "shuckedWeight",
+            "type": "double",
+            "meas": "mm",
+            "description": "weight of meat"
+        },
+        {
+            "name": "visceraWeight",
+            "type": "double",
+            "meas": "mm",
+            "description": "gut weight (after bleeding)"
+        },
+        {
+            "name": "shellWeight",
+            "type": "double",
+            "meas": "mm",
+            "description": "after being dried"
+        },
+        {
+            "name": "rings",
+            "type": "boolean",
+            "meas": "mm",
+            "description": "+1.5 gives the age in years"
+        }
+    ],
+    "categories": [
+        "M",
+        "F",
+        "I"
+    ]
+}
