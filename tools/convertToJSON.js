@@ -40,7 +40,7 @@ let dataset = samples.map(sample => {
     };
 
     attributes.forEach((attribute, index) => {
-        result[attribute] = props[index+1];
+        result[attribute] = parseFloat(props[index+1]);
     });
 
     return result;
