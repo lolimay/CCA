@@ -9,7 +9,7 @@ function normalize(value: number, min: number, max: number, precision?: number) 
 
 export function normalization() {
     if (localStorage.hasOwnProperty('normalized-dataset')) { // use cache by default
-        return;
+        return JSON.parse(localStorage.getItem('normalized-dataset'));
     }
 
     const dataset: Array<any> = JSON.parse(localStorage.getItem('dataset'));
@@ -37,4 +37,6 @@ export function normalization() {
         }
     });
     localStorage.setItem('normalized-dataset', JSON.stringify(dataset));
+
+    return dataset;
 }

@@ -1,7 +1,7 @@
 import 'xterm/css/xterm.css';
 import './index.css';
-import { green, red, yellow, print } from './utils';
 import { normalization } from './preprocess';
+import { green, print, red, yellow } from './utils';
 
 import dataset from '../data/abalone/abalone.json';
 
@@ -9,6 +9,6 @@ if (!localStorage.hasOwnProperty('dataset')) {
     localStorage.setItem('dataset', JSON.stringify(dataset));
 }
 
-normalization();
+const normalizedDataset = normalization();
 
-print(localStorage.getItem('normalized-dataset'));
+print(normalizedDataset);
