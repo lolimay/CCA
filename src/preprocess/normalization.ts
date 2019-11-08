@@ -15,10 +15,11 @@ export function normalization() {
     const dataset: Array<any> = JSON.parse(localStorage.getItem('dataset'));
     let maxAndMins = {};
 
-    dataset.forEach(sample => {
-        delete sample.truth;
-        
-        for (let attribute in sample) {
+    dataset.forEach(sample => {   
+        const props = JSON.parse(JSON.stringify(sample));
+
+        delete props.truth;    
+        for (let attribute in props) {
             if (!maxAndMins[`${ attribute }`]) {
                 maxAndMins[`${ attribute }`] = {};
             }
@@ -31,7 +32,10 @@ export function normalization() {
         }
     });
     dataset.forEach(sample => {
-        for (let attribute in sample) {
+        const props = JSON.parse(JSON.stringify(sample));
+
+        delete props.truth;
+        for (let attribute in props) {
             const { max, min } = maxAndMins[`${ attribute }`];
             sample[`${ attribute }`] = normalize(sample[`${ attribute }`], min, max, 3);
         }
