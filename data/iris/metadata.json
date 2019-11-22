@@ -1,0 +1,10 @@
+{
+    "numberOfInstances": 150,
+    "numberOfAttributes": 3,
+    "attributes": [ "slength", "swidth", "plength", "pwidth" ],
+    "categories": [
+        "setosa",
+        "versicolor",
+        "virginicaI"
+    ]
+}

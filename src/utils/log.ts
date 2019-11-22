@@ -14,7 +14,7 @@ if (terminalHTMLElement !== null) {
     fitAddon.fit();
 }
 
-export function print(s: any) {
+function printOne(s: any) {
     if (typeof s === 'string') {
         term.writeln(s);
         return;
@@ -23,4 +23,10 @@ export function print(s: any) {
     const lines = JSON.stringify(s, null, 4).split('\n');
 
     lines.forEach(line => term.writeln(line));
+}
+
+export function print(...s: any) {
+    for (let item of s) {
+        printOne(item);
+    }
 }

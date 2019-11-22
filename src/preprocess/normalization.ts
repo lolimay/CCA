@@ -1,13 +1,6 @@
-function normalize(value: number, min: number, max: number, precision?: number) {
-    let result = (value - min)/(max - min);
+import { toFixed } from '../utils';
 
-    if (typeof precision === 'number') {
-        result = parseFloat(result.toFixed(precision));
-    }
-    return result;
-}
-
-export function normalization() {
+export function normalization(): Array<any> {
     if (localStorage.hasOwnProperty('normalized-dataset')) { // use cache by default
         return JSON.parse(localStorage.getItem('normalized-dataset'));
     }
@@ -37,10 +30,16 @@ export function normalization() {
         delete props.truth;
         for (let attribute in props) {
             const { max, min } = maxAndMins[`${ attribute }`];
-            sample[`${ attribute }`] = normalize(sample[`${ attribute }`], min, max, 3);
+            sample[`${ attribute }`] = normalize(sample[`${ attribute }`], min, max);
         }
     });
     localStorage.setItem('normalized-dataset', JSON.stringify(dataset));
 
     return dataset;
+}
+
+function normalize(value: number, min: number, max: number) {
+    let result = (value - min)/(max - min);
+
+    return toFixed(result);
 }

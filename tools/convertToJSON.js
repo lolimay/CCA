@@ -14,7 +14,7 @@ const basePath = path.join(__dirname, process.argv[2]);
 const basename = path.basename(basePath);
 const dataPath = `${ basePath }/${ basename }.data`;
 const descPath = `${ basePath }/metadata.json`;
-const savePath = `${ basePath }/abalone.json`;
+const savePath = `${ basePath }/${ basename }.json`;
 
 if (!fs.existsSync(dataPath) || !fs.existsSync(descPath)) {
     console.error(`${ chalk.red('[Error]') } The essential files not exist!`);
@@ -26,8 +26,6 @@ let { attributes, numberOfInstances } =  JSON.parse(String(names));
 const data = fs.readFileSync(dataPath);
 const samples = String(data).split('\n');
 
-attributes = attributes.map(({ name }) => name);
-
 let dataset = samples.map(sample => {
     const props = sample.split(',');
     
@@ -36,11 +34,11 @@ let dataset = samples.map(sample => {
     }
 
     const result = {
-        truth: sample[0]
+        truth: props[4]
     };
 
     attributes.forEach((attribute, index) => {
-        result[attribute] = parseFloat(props[index+1]);
+        result[attribute] = parseFloat(props[index]);
     });
 
     return result;

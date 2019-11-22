@@ -7,7 +7,7 @@
             true,
             "single"
         ],
-        "no-console": true,
+        "no-console": false,
         "semicolon": true
     },
     "rulesDirectory": [],
