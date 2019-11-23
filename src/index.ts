@@ -1,63 +1,78 @@
 import 'xterm/css/xterm.css';
 import './index.css';
 import { normalization } from './preprocess';
-import { getRandomInt, toFixed, print } from './utils';
+import { getRandomInt, toFixed } from './utils';
 
 import originalDataset from '../data/iris/iris.json';
 
-if (!localStorage.hasOwnProperty('dataset')) {
-    localStorage.setItem('dataset', JSON.stringify(originalDataset));
-}
-
-let trainingRound = 0; // 找覆盖中心的迭代次数
-let covers = new Map<any, Array<any>>(); // 用于存放所有的覆盖
+const splittedDatasets = []; // 分割后的数据集
 // 全局变量
 
-let dataset = normalization(); // 数据集归一化
-project(dataset); // 数据集升维
+// 十交叉随机分成10个子数据集
+for (let i=0; i < 10; i++) {
+    splittedDatasets.push([]);
+}
+while (originalDataset.length > 0) {
+    splittedDatasets.forEach(subDataset => {
+        subDataset.push(...originalDataset.splice(getRandomInt(originalDataset.length), 1));
+    });
+}
 
-// 初始状态
-console.log(`
-👀👀👀 Initial status 👀👀👀
-dataset.length: ${ dataset.length } 👏
-setosa.length: ${ dataset.filter(({ truth }) => truth === 'setosa').length } 👍
-versicolor.length: ${ dataset.filter(({ truth }) => truth === 'versicolor').length } 👻
-virginica.lenth: ${ dataset.filter(({ truth }) => truth === 'virginica').length } 🙀
-R: ${
-    dataset.map(sample => {
-        let sum = 0;
-        for (let attribute in sample) {
-            if (attribute === 'truth') {
-                continue;
+// 测试准确率，10次取平均
+let accuracies = [];
+for (let i=0; i<10; i++) {
+    accuracies.push(testAccuracy());
+}
+let average_accuracy = accuracies.reduce((pre, cuur) => pre + cuur) / accuracies.length;
+const rate_difference = accuracies.reduce((pre, curr) => pre + (curr - average_accuracy) * (curr - average_accuracy)) / accuracies.length;
+
+console.log(
+    'avaerage_accuracy: ', (average_accuracy * 100).toFixed(4).toString() + '%',
+    'rate_difference: ', (rate_difference * 100).toFixed(4).toString() + '%'
+);
+
+// 测试准确率
+function testAccuracy() {
+    let total_success_rate = 0;
+    for(let i=0; i<10; i++) {
+        let trainingRound = 0; // 找覆盖中心的迭代次数
+        let covers = new Map<any, Array<any>>(); // 用于存放所有的覆盖
+        let testingDataset = splittedDatasets[i]; // 训练数据集
+        let trainingDataset = splittedDatasets.filter(dataset => dataset !== testingDataset).reduce((pre, cur) => pre.concat(cur));
+
+        testingDataset = JSON.parse(JSON.stringify(testingDataset));
+        trainingDataset = JSON.parse(JSON.stringify(trainingDataset));
+
+        let dataset = normalization(trainingDataset); // 数据集归一化
+        dataset = project(dataset); // 数据集升维
+
+        construct(dataset, trainingRound, covers); // 覆盖性构造算法
+
+        // 测试
+        let total_count = testingDataset.length;
+        let success_count = 0;
+        let success_rate = 0;
+        testingDataset.forEach(sample => {
+            for (let coverCenter of covers.keys()) {
+                const innerProduct = getDotProduct(sample, coverCenter);
+                const theta = coverCenter.theta + 1;
+
+                if (innerProduct > theta && sample.truth === coverCenter.truth) {
+                    success_count++; // 预测成功
+                    return;
+                }
             }
-            sum = sum + sample[attribute] * sample[attribute];
-        }
-        return sum;
-    }).reduce((pre, curr) => pre += curr) / dataset.length
-}
-`.trim());
-
-construct(); // 覆盖性构造算法
-
-// 打印所有覆盖
-for (let cover of covers.values()) {
-    console.log(cover);
-}
-
-// 分类器
-// 根据得到的覆盖集，对一个未知的样本进行预测
-function classifier(sample, covers) {
-    let predict; // 预测值
-
-    for (let cover of covers.values()) {
-        if ()
+        });
+        success_rate = success_count / total_count;
+        total_success_rate += success_rate;
     }
+    console.log('本次准确率: ', total_success_rate / 10);
+    return total_success_rate / 10;
 }
 
 // CCA构造算法核心
-function construct() {
-    console.log(`🎉🎉🎉 Training Round ${ ++trainingRound } 🎉🎉🎉`);
-    const { index: coverCenterIndex, sample: coverCenter } = getARandomCoverCenter(dataset);
+function construct(dataset, trainingRound, covers) {
+    const { index: coverCenterIndex, sample: coverCenter } = getARandomCoverCenter(JSON.parse(JSON.stringify(dataset)));
 
     coverCenter.theta = getTheta(coverCenter, dataset); 
     covers.set(coverCenter, [coverCenter]); // 先把覆盖中心本身加到它这个覆盖中
@@ -74,9 +89,6 @@ function construct() {
         dataset = updateCoveredSamples(dataset);
     }
     
-    console.log(`
-    cover.length: ${ covers.get(coverCenter).length }\ndataset.length: ${ dataset.length }
-    `.trim());
     const truth = covers.get(coverCenter)[0].truth;
     covers.get(coverCenter).forEach(sample => {
         if (sample.truth !== truth) {
@@ -84,7 +96,7 @@ function construct() {
         }
     });
     if (dataset.length > 0) {
-        construct();
+        construct(dataset, trainingRound, covers); // 覆盖性构造算法
     }
 }
 
@@ -191,12 +203,14 @@ function getRSquare(dataset: Array<any>): number {
 }
 
 // 数据集升维
-function project(dataset: Array<any>): void {
+function project(dataset: Array<any>): Array<any> {
     const rSquare = getRSquare(dataset);
 
-    dataset.forEach(sample => {
+    return dataset.map(sample => {
         const modularSquare = getModularSquare(sample);
         const _balance = Math.sqrt(rSquare - modularSquare);
         sample._balance = _balance;
+
+        return sample;
     });
 }

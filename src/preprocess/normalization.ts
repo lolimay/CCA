@@ -1,11 +1,4 @@
-import { toFixed } from '../utils';
-
-export function normalization(): Array<any> {
-    if (localStorage.hasOwnProperty('normalized-dataset')) { // use cache by default
-        return JSON.parse(localStorage.getItem('normalized-dataset'));
-    }
-
-    const dataset: Array<any> = JSON.parse(localStorage.getItem('dataset'));
+export function normalization(dataset: Array<any>): Array<any> {
     let maxAndMins = {};
 
     dataset.forEach(sample => {   
@@ -33,7 +26,6 @@ export function normalization(): Array<any> {
             sample[`${ attribute }`] = normalize(sample[`${ attribute }`], min, max);
         }
     });
-    localStorage.setItem('normalized-dataset', JSON.stringify(dataset));
 
     return dataset;
 }
@@ -41,5 +33,5 @@ export function normalization(): Array<any> {
 function normalize(value: number, min: number, max: number) {
     let result = (value - min)/(max - min);
 
-    return toFixed(result);
+    return result;
 }
